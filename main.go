@@ -2,57 +2,68 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"os"
 	"os/signal"
+	"path"
 	"strconv"
 	"strings"
 	"syscall"
 	"time"
 
+	"github.com/denverquane/amongusdiscord/locale"
 	"github.com/denverquane/amongusdiscord/storage"
 
 	"github.com/denverquane/amongusdiscord/discord"
 	"github.com/joho/godotenv"
 )
 
-const VERSION = "2.3.2-Prerelease"
+var (
+	version = "6.9.0"
+	commit  = "none"
+	date    = "unknown"
+)
 
-//TODO if running in shard mode, we don't want to use the default port. Each shard should prob run on their own port
-const DefaultPort = "8123"
-const DefaultURL = "http://localhost"
+const DefaultURL = "http://localhost:8123"
 
 func main() {
+	// seed the rand generator (used for making connection codes)
+	rand.Seed(time.Now().Unix())
 	err := discordMainWrapper()
 	if err != nil {
 		log.Println("Program exited with the following error:")
 		log.Println(err)
-		log.Println("This window will automatically terminate in 10 seconds")
-		time.Sleep(10 * time.Second)
 		return
 	}
 }
 
 func discordMainWrapper() error {
-	err := godotenv.Load("config.txt")
+	err := godotenv.Load("final.txt")
 	if err != nil {
-		err = godotenv.Load("final.txt")
-		if err != nil {
-			log.Println("Can't open config file, hopefully you're running in docker and have provided the DISCORD_BOT_TOKEN...")
+		err = godotenv.Load("config.txt")
+		if err != nil && os.Getenv("DISCORD_BOT_TOKEN") == "" {
+			log.Println("Can't open config file and missing DISCORD_BOT_TOKEN; creating config.txt for you to use for your config")
 			f, err := os.Create("config.txt")
 			if err != nil {
 				log.Println("Issue creating sample config.txt")
 				return err
 			}
-			_, err = f.WriteString("DISCORD_BOT_TOKEN = \n")
+			_, err = f.WriteString(fmt.Sprintf("DISCORD_BOT_TOKEN=\nBOT_LANG=%s\n", locale.DefaultLang))
 			f.Close()
 		}
 	}
 
+	logPath := os.Getenv("LOG_PATH")
+	if logPath == "" {
+		logPath = "./"
+	}
+
 	logEntry := os.Getenv("DISABLE_LOG_FILE")
 	if logEntry == "" {
-		file, err := os.Create("logs.txt")
+		file, err := os.Create(path.Join(logPath, "logs.txt"))
 		if err != nil {
 			return err
 		}
@@ -62,16 +73,26 @@ func discordMainWrapper() error {
 
 	emojiGuildID := os.Getenv("EMOJI_GUILD_ID")
 
-	log.Println(VERSION)
+	log.Println(version + "-" + commit)
 
 	discordToken := os.Getenv("DISCORD_BOT_TOKEN")
 	if discordToken == "" {
 		return errors.New("no DISCORD_BOT_TOKEN provided")
 	}
 
+	extraTokens := []string{}
+	extraTokenStr := strings.ReplaceAll(os.Getenv("WORKER_BOT_TOKENS"), " ", "")
+	if extraTokenStr != "" {
+		extraTokens = strings.Split(extraTokenStr, ",")
+	}
+
 	discordToken2 := os.Getenv("DISCORD_BOT_TOKEN_2")
 	if discordToken2 != "" {
-		log.Println("You provided a 2nd Discord Bot Token, so I'll try to use it")
+		log.Println("[INFO] DISCORD_BOT_TOKEN_2 is deprecated. Please use WORKER_BOT_TOKENS in the future!")
+		extraTokens = append(extraTokens, discordToken2)
+	}
+	if len(extraTokens) > 0 {
+		log.Printf("You provided %d worker tokens so I'll be sending them to Galactus\n", len(extraTokens))
 	}
 
 	numShardsStr := os.Getenv("NUM_SHARDS")
@@ -79,92 +100,97 @@ func discordMainWrapper() error {
 	if err != nil {
 		numShards = 1
 	}
-	ports := make([]string, numShards)
-	tempPort := strings.ReplaceAll(os.Getenv("PORT"), " ", "")
-	portStrings := strings.Split(tempPort, ",")
-	if len(ports) == 0 || len(tempPort) == 0 {
-		num, err := strconv.Atoi(tempPort)
 
-		if err != nil || num < 1024 || num > 65535 {
-			log.Printf("[Info] Invalid or no particular PORT (range [1024-65535]) provided. Defaulting to %s\n", DefaultPort)
-			ports[0] = DefaultPort
-		}
-	} else if len(portStrings) == numShards {
-		for i := 0; i < numShards; i++ {
-			num, err := strconv.Atoi(portStrings[i])
-			if err != nil || num < 0 || num > 65535 {
-				return errors.New("invalid or no particular PORT (range [0-65535]) provided")
-			}
-			ports[i] = portStrings[i]
-		}
-	} else {
-		return errors.New("the number of shards does not match the number of ports provided")
+	shardIDStr := os.Getenv("SHARD_ID")
+	shardID, err := strconv.Atoi(shardIDStr)
+	if shardID >= numShards {
+		return errors.New("you specified a shardID higher than or equal to the total number of shards")
+	}
+	if err != nil {
+		shardID = 0
 	}
 
-	url := os.Getenv("SERVER_URL")
+	url := os.Getenv("HOST")
 	if url == "" {
-		log.Printf("[Info] No valid SERVER_URL provided. Defaulting to %s\n", DefaultURL)
+		log.Printf("[Info] No valid HOST provided. Defaulting to %s\n", DefaultURL)
 		url = DefaultURL
 	}
 
-	extPort := os.Getenv("EXT_PORT")
-	if extPort == "" {
-		log.Print("[Info] No EXT_PORT provided. Defaulting to PORT\n")
-	} else if extPort == "protocol" {
-		log.Print("[Info] EXT_PORT set to protocol. Not adding port to url\n")
+	var redisClient discord.RedisInterface
+	var storageInterface storage.StorageInterface
+
+	redisAddr := os.Getenv("REDIS_ADDR")
+	redisPassword := os.Getenv("REDIS_PASS")
+	if redisAddr != "" {
+		err := redisClient.Init(storage.RedisParameters{
+			Addr:     redisAddr,
+			Username: "",
+			Password: redisPassword,
+		})
+		if err != nil {
+			log.Println(err)
+		}
+		err = storageInterface.Init(storage.RedisParameters{
+			Addr:     redisAddr,
+			Username: "",
+			Password: redisPassword,
+		})
+		if err != nil {
+			log.Println(err)
+		}
 	} else {
-		num, err := strconv.Atoi(extPort)
-		if err != nil || num > 65535 || (num < 1024 && num != 80 && num != 443) {
-			return errors.New("invalid EXT_PORT (range [1024-65535]) provided")
-		}
+		return errors.New("no REDIS_ADDR specified; exiting")
 	}
 
-	var storageClient storage.StorageInterface
-	dbSuccess := false
-
-	authPath := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")
-	projectID := os.Getenv("FIRESTORE_PROJECT_ID")
-	if authPath != "" && projectID != "" {
-		log.Println("GOOGLE_APPLICATION_CREDENTIALS variable is set; attempting to use Firestore as the Storage Driver")
-		storageClient = &storage.FirestoreDriver{}
-		err = storageClient.Init(projectID)
-		if err != nil {
-			log.Printf("Failed to create Firestore client with error: %s", err)
-		} else {
-			dbSuccess = true
-			log.Println("Success in initializing Firestore client as the Storage Driver")
-		}
+	galactusAddr := os.Getenv("GALACTUS_ADDR")
+	if galactusAddr == "" {
+		return errors.New("no GALACTUS_ADDR specified; exiting")
 	}
 
-	if !dbSuccess {
-		storageClient = &storage.FilesystemDriver{}
-		configPath := os.Getenv("CONFIG_PATH")
-		if configPath == "" {
-			configPath = "./"
-		}
-		log.Printf("Using %s as the base path for config", configPath)
-		err := storageClient.Init(configPath)
-		if err != nil {
-			log.Fatalf("Failed to create Filesystem Storage Driver with error: %s", err)
-		}
-		log.Println("Success in initializing the local Filesystem as the Storage Driver")
+	galactusClient, err := discord.NewGalactusClient(galactusAddr)
+	if err != nil {
+		log.Println("Error connecting to Galactus!")
+		return err
 	}
+
+	locale.InitLang(os.Getenv("LOCALE_PATH"), os.Getenv("BOT_LANG"))
+
+	psql := storage.PsqlInterface{}
+	pAddr := os.Getenv("POSTGRES_ADDR")
+	if pAddr == "" {
+		return errors.New("no POSTGRES_ADDR specified; exiting")
+	}
+
+	pUser := os.Getenv("POSTGRES_USER")
+	if pUser == "" {
+		return errors.New("no POSTGRES_USER specified; exiting")
+	}
+
+	pPass := os.Getenv("POSTGRES_PASS")
+	if pPass == "" {
+		return errors.New("no POSTGRES_PASS specified; exiting")
+	}
+
+	err = psql.Init(storage.ConstructPsqlConnectURL(pAddr, pUser, pPass))
+	if err != nil {
+		return err
+	}
+
+	if os.Getenv("AUTOMUTEUS_OFFICIAL") == "" {
+		go psql.LoadAndExecFromFile("./storage/postgres.sql")
+	}
+
 	log.Println("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt, os.Kill)
 
-	bots := make([]*discord.Bot, numShards)
-
-	for i := 0; i < numShards; i++ {
-		bots[i] = discord.MakeAndStartBot(VERSION, discordToken, discordToken2, url, ports[i], extPort, emojiGuildID, numShards, i, storageClient)
-	}
-
-	go discord.MessagesServer("5000", bots)
+	bot := discord.MakeAndStartBot(version, commit, discordToken, url, emojiGuildID, extraTokens, numShards, shardID, &redisClient, &storageInterface, &psql, galactusClient, logPath)
 
 	<-sc
-	for i := 0; i < numShards; i++ {
-		bots[i].Close()
-	}
-	storageClient.Close()
+	//bot.GracefulClose()
+	log.Printf("Received Sigterm or Kill signal. Bot will terminate in 1 second")
+	time.Sleep(time.Second)
+
+	bot.Close()
 	return nil
 }

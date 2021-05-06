@@ -1,1 +1,0 @@
-TODO Refactor UserData to use properly locking getters/setters/transformers
