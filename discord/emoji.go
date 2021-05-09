@@ -136,7 +136,7 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 		},
 		game.Skincolor: {
 			Name: "auskincolor",
-			ID:   "840873342868520980",
+			ID:   "835189203381256193",
 		},
 		game.Bordeaux: {
 			Name: "aubordeaux",
