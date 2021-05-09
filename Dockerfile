@@ -14,6 +14,8 @@ RUN go mod download
 # Import the code from the context.
 COPY ./ ./
 
+RUN go mod vendor
+
 # Build the executable to `/app`. Mark the build as statically linked.
 # hadolint ignore=SC2155
 RUN export TAG=$(git describe --tags "$(git rev-list --tags --max-count=1)") && \
