@@ -134,7 +134,7 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 			Name: "aulime",
 			ID:   "762392088121442334",
 		},
-		/*game.Skincolor: {
+		game.Skincolor: {
 			Name: "auskincolor",
 			ID:   "835189203381256193",
 		},
@@ -181,7 +181,7 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 		game.Petrol: {
 			Name: "aupetrol",
 			ID:   "835321101293846529",
-		},*/
+		},
 	},
 	false: []Emoji{
 		game.Red: {
@@ -232,7 +232,7 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 			Name: "aulimedead",
 			ID:   "762397192366325793",
 		},
-		/*game.Skincolor: {
+		game.Skincolor: {
 			Name: "auskincolordead",
 			ID:   "835189220154015775",
 		},
@@ -279,6 +279,6 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 		game.Petrol: {
 			Name: "aupetroldead",
 			ID:   "835321129232760853",
-		},*/
+		},
 	},
 }
