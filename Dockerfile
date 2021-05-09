@@ -14,7 +14,7 @@ RUN go mod download
 # Import the code from the context.
 COPY ./ ./
 
-#RUN go mod vendor
+RUN go mod vendor
 
 # Build the executable to `/app`. Mark the build as statically linked.
 # hadolint ignore=SC2155
