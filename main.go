@@ -4,12 +4,12 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
-	"github.com/automuteus/automuteus/v8/bot/command"
-	"github.com/automuteus/automuteus/v8/bot/tokenprovider"
-	"github.com/automuteus/automuteus/v8/internal/server"
-	"github.com/automuteus/automuteus/v8/pkg/capture"
-	"github.com/automuteus/automuteus/v8/pkg/locale"
-	storage2 "github.com/automuteus/automuteus/v8/pkg/storage"
+	"github.com/j0nas500/automuteus-tor/bot/command"
+	"github.com/j0nas500/automuteus-tor/bot/tokenprovider"
+	"github.com/j0nas500/automuteus-tor/internal/server"
+	"github.com/j0nas500/automuteus-tor/pkg/capture"
+	"github.com/j0nas500/automuteus-tor/pkg/locale"
+	storage2 "github.com/j0nas500/automuteus-tor/pkg/storage"
 	"github.com/bwmarrin/discordgo"
 	"io"
 	"log"
@@ -22,9 +22,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/automuteus/automuteus/v8/storage"
+	"github.com/j0nas500/automuteus/storage"
 
-	"github.com/automuteus/automuteus/v8/bot"
+	"github.com/j0nas500/automuteus/discord"
 )
 
 var (

@@ -6,6 +6,10 @@ import (
 	"os"
 )
 
+const (
+	DefaultBaseUrl = "https://github.com/j0nas500/automuteus-tor/blob/master/assets/maps/"
+)
+
 var Map = discordgo.ApplicationCommand{
 	Name:        "map",
 	Description: "View Among Us game maps",

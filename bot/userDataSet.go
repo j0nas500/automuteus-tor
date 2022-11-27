@@ -2,8 +2,9 @@ package bot
 
 import (
 	"fmt"
-	"github.com/automuteus/automuteus/v8/pkg/amongus"
 	"strings"
+
+	"github.com/j0nas500/automuteus-tor/pkg/amongus"
 )
 
 type UserDataSet map[string]UserData
