@@ -74,8 +74,8 @@ func (a AlivenessEmojis) isEmpty() bool {
 
 func emptyStatusEmojis() AlivenessEmojis {
 	topMap := make(AlivenessEmojis)
-	topMap[true] = make([]Emoji, 18) // 18 colors for alive/dead
-	topMap[false] = make([]Emoji, 18)
+	topMap[true] = make([]Emoji, 35) // 35 colors for alive/dead
+	topMap[false] = make([]Emoji, 35)
 	return topMap
 }
 
@@ -270,14 +270,14 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 			Name: "aured",
 			ID:   "866558066921177108",
 		},
-		game.Sunrise : {
+		game.Sunrise: {
 			Name: "aured",
 			ID:   "866558066921177108",
 		},
-		game.Ice : {
+		game.Ice: {
 			Name: "aured",
 			ID:   "866558066921177108",
-		},		
+		},
 	},
 	false: []Emoji{
 		game.Red: {
@@ -412,11 +412,11 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 			Name: "aureddead",
 			ID:   "866558066921177108",
 		},
-		game.Sunrise : {
+		game.Sunrise: {
 			Name: "aureddead",
 			ID:   "866558066921177108",
 		},
-		game.Ice : {
+		game.Ice: {
 			Name: "aureddead",
 			ID:   "866558066921177108",
 		},
