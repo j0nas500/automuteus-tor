@@ -5,7 +5,6 @@ import (
 	"github.com/j0nas500/automuteus-tor/pkg/settings"
 	"github.com/bwmarrin/discordgo"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
-	"strings"
 )
 
 type LinkStatus int
@@ -29,15 +28,22 @@ var Link = discordgo.ApplicationCommand{
 		{
 			Type:        discordgo.ApplicationCommandOptionString,
 			Name:        "color",
-			Description: "In-game color",
-			Required:    true,
-			Choices:     colorsToCommandChoices(),
+			Description: "Vanilla In-game color",
+			Required:    false,
+			Choices:     colorsVanillaToCommandChoices(),
+		},
+		{
+			Type:        discordgo.ApplicationCommandOptionString,
+			Name:        "color",
+			Description: "Tor In-game color",
+			Required:    false,
+			Choices:     colorsTorToCommandChoices(),
 		},
 	},
 }
 
-func GetLinkParams(s *discordgo.Session, options []*discordgo.ApplicationCommandInteractionDataOption) (string, string) {
-	return options[0].UserValue(s).ID, strings.ReplaceAll(strings.ToLower(options[1].StringValue()), " ", "")
+func GetLinkParams(s *discordgo.Session, options []*discordgo.ApplicationCommandInteractionDataOption) (string, string, string) {
+	return options[0].UserValue(s).ID, strings.ReplaceAll(strings.ToLower(options[1].StringValue()), " ", ""), strings.ReplaceAll(strings.ToLower(options[2].StringValue()), " ", "")
 }
 
 func LinkResponse(status LinkStatus, userID, color string, sett *settings.GuildSettings) *discordgo.InteractionResponse {
