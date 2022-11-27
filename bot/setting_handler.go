@@ -3,8 +3,8 @@ package bot
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/automuteus/automuteus/v8/bot/setting"
-	"github.com/automuteus/automuteus/v8/pkg/settings"
+	"github.com/j0nas500/automuteus-tor/bot/setting"
+	"github.com/j0nas500/automuteus-tor/pkg/settings"
 	"log"
 )
 

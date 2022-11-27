@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/automuteus/automuteus/v8/pkg/game"
+	"github.com/j0nas500/automuteus-tor/pkg/game"
 
 	"github.com/bwmarrin/discordgo"
 )
@@ -109,7 +109,8 @@ func (bot *Bot) verifyEmojis(s *discordgo.Session, guildID string, alive bool, s
 	}
 }
 
-func EmojisToSelectMenuOptions(emojis []Emoji, unlinkEmoji string) (arr []discordgo.SelectMenuOption) {
+// TODO
+func EmojisToSelectMenuOptions(emojis []Emoji, unlinkEmoji string) (arr []discordgo.SelectMenuOption, (isVanillaColor bool)) {
 	for i, v := range emojis {
 		arr = append(arr, v.toSelectMenuOption(game.GetColorStringForInt(i)))
 	}
@@ -209,6 +210,74 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 			Name: "aucoral",
 			ID:   "866558066552209448",
 		},
+		game.Salmon: {
+			Name: "ausalmon",
+			ID:   "866558066921177108",
+		},
+		game.Bordeaux: {
+			Name: "aubordeaux",
+			ID:   "866558066921177108",
+		},
+		game.Olive: {
+			Name: "auolive",
+			ID:   "866558066921177108",
+		},
+		game.Turqoise: {
+			Name: "auturqoise",
+			ID:   "866558066921177108",
+		},
+		game.Mint: {
+			Name: "aumint",
+			ID:   "866558066921177108",
+		},
+		game.Lavender: {
+			Name: "aulavender",
+			ID:   "866558066921177108",
+		},
+		game.Nougat: {
+			Name: "aunougat",
+			ID:   "866558066921177108",
+		},
+		game.Peach: {
+			Name: "aupeach",
+			ID:   "866558066921177108",
+		},
+		game.Wasabi: {
+			Name: "aured",
+			ID:   "866558066921177108",
+		},
+		game.HotPink: {
+			Name: "auhotpink",
+			ID:   "866558066921177108",
+		},
+		game.Petrol: {
+			Name: "aupetrol",
+			ID:   "866558066921177108",
+		},
+		game.Lemon: {
+			Name: "aured",
+			ID:   "866558066921177108",
+		},
+		game.SignalOrange: {
+			Name: "aured",
+			ID:   "866558066921177108",
+		},
+		game.Teal: {
+			Name: "aured",
+			ID:   "866558066921177108",
+		},
+		game.Blurple: {
+			Name: "aured",
+			ID:   "866558066921177108",
+		},
+		game.Sunrise : {
+			Name: "aured",
+			ID:   "866558066921177108",
+		},
+		game.Ice : {
+			Name: "aured",
+			ID:   "866558066921177108",
+		}		
 	},
 	false: []Emoji{
 		game.Red: {
@@ -283,6 +352,74 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 			Name: "aucoraldead",
 			ID:   "866558067024723978",
 		},
+		game.Salmon: {
+			Name: "ausalmondead",
+			ID:   "866558066921177108",
+		},
+		game.Bordeaux: {
+			Name: "aubordeauxdead",
+			ID:   "866558066921177108",
+		},
+		game.Olive: {
+			Name: "auolivedead",
+			ID:   "866558066921177108",
+		},
+		game.Turqoise: {
+			Name: "auturqoisedead",
+			ID:   "866558066921177108",
+		},
+		game.Mint: {
+			Name: "aumintdead",
+			ID:   "866558066921177108",
+		},
+		game.Lavender: {
+			Name: "aulavenderdead",
+			ID:   "866558066921177108",
+		},
+		game.Nougat: {
+			Name: "aunougatdead",
+			ID:   "866558066921177108",
+		},
+		game.Peach: {
+			Name: "aupeachdead",
+			ID:   "866558066921177108",
+		},
+		game.Wasabi: {
+			Name: "aureddead",
+			ID:   "866558066921177108",
+		},
+		game.HotPink: {
+			Name: "auhotpinkdead",
+			ID:   "866558066921177108",
+		},
+		game.Petrol: {
+			Name: "aupetroldead",
+			ID:   "866558066921177108",
+		},
+		game.Lemon: {
+			Name: "aureddead",
+			ID:   "866558066921177108",
+		},
+		game.SignalOrange: {
+			Name: "aureddead",
+			ID:   "866558066921177108",
+		},
+		game.Teal: {
+			Name: "aureddead",
+			ID:   "866558066921177108",
+		},
+		game.Blurple: {
+			Name: "aureddead",
+			ID:   "866558066921177108",
+		},
+		game.Sunrise : {
+			Name: "aureddead",
+			ID:   "866558066921177108",
+		},
+		game.Ice : {
+			Name: "aureddead",
+			ID:   "866558066921177108",
+		}
 	},
 }
 
@@ -306,6 +443,23 @@ Helpful for copy/paste into Discord to get new emoji IDs when they are re-upload
 \:augray:
 \:autan:
 \:aucoral:
+\:ausalmon:
+\:aubordeaux:
+\:auolive:
+\:auturqoise:
+\:aumint:
+\:aulavender:
+\:aunougat:
+\:aupeach:
+WASABI
+\:auhotpink:
+\:aupetrol:
+LEMON
+SIGNALORANGE
+TEAL
+BLURPLE
+SUNRISE
+ICE
 
 \:aureddead:
 \:aubluedead:
@@ -325,4 +479,21 @@ Helpful for copy/paste into Discord to get new emoji IDs when they are re-upload
 \:augraydead:
 \:autandead:
 \:aucoraldead:
+\:ausalmondead:
+\:aubordeauxdead:
+\auolivedead:
+\:auturqoisedead:
+\:aumintdead:
+\:aulavenderdead:
+\:aunougatdead:
+\:aupeachdead:
+WASABI
+\:auhotpinkdead:
+\:aupetroldead:
+LEMON
+SIGNALORANGE
+TEAL
+BLURPLE
+SUNRISE
+ICE
 */

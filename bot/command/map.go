@@ -1,7 +1,7 @@
 package command
 
 import (
-	"github.com/automuteus/automuteus/v8/pkg/game"
+	"github.com/j0nas500/automuteus-tor/pkg/game"
 	"github.com/bwmarrin/discordgo"
 	"os"
 )

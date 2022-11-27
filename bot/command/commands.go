@@ -2,9 +2,9 @@ package command
 
 import (
 	"fmt"
-	"github.com/automuteus/automuteus/v8/pkg/discord"
-	"github.com/automuteus/automuteus/v8/pkg/game"
-	"github.com/automuteus/automuteus/v8/pkg/settings"
+	"github.com/j0nas500/automuteus-tor/pkg/discord"
+	"github.com/j0nas500/automuteus-tor/game"
+	"github.com/j0nas500/automuteus-torpkg/settings"
 	"github.com/bwmarrin/discordgo"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )

@@ -1,7 +1,7 @@
 package setting
 
 import (
-	"github.com/automuteus/automuteus/v8/pkg/settings"
+	"github.com/j0nas500/automuteus-tor/pkg/settings"
 	"testing"
 )
 

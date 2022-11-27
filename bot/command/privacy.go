@@ -3,8 +3,8 @@ package command
 import (
 	"bytes"
 	"fmt"
-	"github.com/automuteus/automuteus/v8/pkg/settings"
-	"github.com/automuteus/automuteus/v8/pkg/storage"
+	"github.com/j0nas500/automuteus-tor/pkg/settings"
+	"github.com/j0nas500/automuteus-tor/pkg/storage"
 	"github.com/bwmarrin/discordgo"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )

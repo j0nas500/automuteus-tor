@@ -1,8 +1,8 @@
 package bot
 
 import (
-	"github.com/automuteus/automuteus/v8/internal/server"
-	"github.com/automuteus/automuteus/v8/pkg/settings"
+	"github.com/j0nas500/automuteus-tor/internal/server"
+	"github.com/j0nas500/automuteus-tor/pkg/settings"
 	"sync"
 	"time"
 
@@ -115,7 +115,7 @@ func (dgs *GameState) CreateMessage(s *discordgo.Session, me *discordgo.MessageE
 				discordgo.SelectMenu{
 					CustomID:    colorSelectID,
 					Placeholder: "Select your in-game color",
-					Options:     EmojisToSelectMenuOptions(GlobalAlivenessEmojis[true], X),
+					Options:     EmojisToSelectMenuOptions(GlobalAlivenessEmojis[true], X, true),
 				},
 			},
 		},
