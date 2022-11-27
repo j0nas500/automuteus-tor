@@ -251,8 +251,8 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 			ID:   "1046352442440306738",
 		},
 		game.Petrol: {
-			Name: "aupetrol",
-			ID:   "1046352469636173884",
+			Name: "autan",
+			ID:   "1046352452586328064",
 		},
 		game.Lemon: {
 			Name: "aucyan",
@@ -393,8 +393,8 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 			ID:   "1046352492725801030",
 		},
 		game.Petrol: {
-			Name: "aupetroldead",
-			ID:   "866558066921177108",
+			Name: "autandead",
+			ID:   "1046367153047216188",
 		},
 		game.Lemon: {
 			Name: "aucyandead",
@@ -417,8 +417,8 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 			ID:   "1046355495415464008",
 		},
 		game.Ice: {
-			Name: "aureddead",
-			ID:   "866558067049758740",
+			Name: "augraydead",
+			ID:   "1046367151621144616",
 		},
 	},
 }
@@ -621,8 +621,8 @@ var GlobalAlivenessTorEmojis = AlivenessEmojis{
 			ID:   "1046352442440306738",
 		},
 		game.Petrol: {
-			Name: "aupetrol",
-			ID:   "1046352469636173884",
+			Name: "autan",
+			ID:   "1046352452586328064",
 		},
 		game.Lemon: {
 			Name: "aucyan",
@@ -691,8 +691,8 @@ var GlobalAlivenessTorEmojis = AlivenessEmojis{
 			ID:   "1046352492725801030",
 		},
 		game.Petrol: {
-			Name: "aupetroldead",
-			ID:   "866558066921177108",
+			Name: "autandead",
+			ID:   "1046367153047216188",
 		},
 		game.Lemon: {
 			Name: "aucyandead",
@@ -715,8 +715,8 @@ var GlobalAlivenessTorEmojis = AlivenessEmojis{
 			ID:   "1046355495415464008",
 		},
 		game.Ice: {
-			Name: "aureddead",
-			ID:   "866558067049758740",
+			Name: "augraydead",
+			ID:   "1046367151621144616",
 		},
 	},
 }
