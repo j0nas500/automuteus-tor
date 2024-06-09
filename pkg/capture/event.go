@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/automuteus/automuteus/v8/pkg/rediskey"
+	"github.com/j0nas500/automuteus-tor/pkg/rediskey"
 	"github.com/go-redis/redis/v8"
 	"time"
 )

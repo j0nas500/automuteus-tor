@@ -1,9 +1,11 @@
 package command
 
 import (
+	"strings"
+
+	"github.com/bwmarrin/discordgo"
 	"github.com/j0nas500/automuteus-tor/pkg/discord"
 	"github.com/j0nas500/automuteus-tor/pkg/settings"
-	"github.com/bwmarrin/discordgo"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
