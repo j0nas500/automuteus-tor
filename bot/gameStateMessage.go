@@ -1,8 +1,8 @@
 package bot
 
 import (
-	"github.com/j0nas500/automuteus/v8/internal/server"
-	"github.com/j0nas500/automuteus/v8/pkg/settings"
+	"github.com/j0nas500/automuteus/internal/server"
+	"github.com/j0nas500/automuteus/pkg/settings"
 	"sync"
 	"time"
 	"github.com/j0nas500/automuteus-tor/metrics"

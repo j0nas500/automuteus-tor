@@ -1,7 +1,7 @@
 package setting
 
 import (
-	"github.com/j0nas500/automuteus/v8/pkg/locale"
+	"github.com/j0nas500/automuteus/pkg/locale"
 	"testing"
 )
 

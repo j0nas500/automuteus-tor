@@ -1,13 +1,13 @@
 package bot
 
 import (
-	"github.com/j0nas500/automuteus/v8/pkg/settings"
+	"github.com/j0nas500/automuteus/pkg/settings"
 	"log"
 	"strconv"
 	"time"
 
-	"github.com/j0nas500/automuteus/v8/pkg/premium"
-	"github.com/j0nas500/automuteus/v8/pkg/task"
+	"github.com/j0nas500/automuteus/pkg/premium"
+	"github.com/j0nas500/automuteus/pkg/task"
 	"github.com/bsm/redislock"
 
 	"github.com/bwmarrin/discordgo"

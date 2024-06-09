@@ -4,14 +4,14 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/j0nas500/automuteus/v8/pkg/settings"
-	"github.com/j0nas500/automuteus/v8/pkg/storage"
+	"github.com/j0nas500/automuteus/pkg/settings"
+	"github.com/j0nas500/automuteus/pkg/storage"
 	"log"
 	"strconv"
 	"strings"
 
-	"github.com/j0nas500/automuteus/v8/pkg/game"
-	"github.com/j0nas500/automuteus/v8/pkg/rediskey"
+	"github.com/j0nas500/automuteus/pkg/game"
+	"github.com/j0nas500/automuteus/pkg/rediskey"
 	"github.com/bwmarrin/discordgo"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )

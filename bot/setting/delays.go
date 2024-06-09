@@ -1,8 +1,8 @@
 package setting
 
 import (
-	"github.com/j0nas500/automuteus/v8/pkg/game"
-	"github.com/j0nas500/automuteus/v8/pkg/settings"
+	"github.com/j0nas500/automuteus/pkg/game"
+	"github.com/j0nas500/automuteus/pkg/settings"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"strconv"
 )
