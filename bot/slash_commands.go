@@ -22,7 +22,7 @@ import (
 	redis_common "github.com/j0nas500/automuteus-tor/common"
 	"github.com/j0nas500/automuteus-tor/discord/command"
 	"github.com/j0nas500/automuteus-tor/discord/setting"
-	"github.com/j0nas500/automuteus-tor/metrics"
+	"github.com/j0nas500/automuteus-tor/v8/metrics"
 	"github.com/j0nas500/utils/pkg/discord"
 	"github.com/j0nas500/utils/pkg/premium"
 	"github.com/j0nas500/utils/pkg/settings"

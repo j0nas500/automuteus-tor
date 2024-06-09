@@ -5,10 +5,7 @@ import (
 	"github.com/j0nas500/automuteus/v8/pkg/settings"
 	"sync"
 	"time"
-
 	"github.com/j0nas500/automuteus-tor/metrics"
-	"github.com/j0nas500/utils/pkg/settings"
-
 	"github.com/bwmarrin/discordgo"
 )
 

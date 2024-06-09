@@ -15,7 +15,7 @@ import (
 	"github.com/j0nas500/automuteus/v8/pkg/settings"
 	storageutils "github.com/j0nas500/automuteus/v8/pkg/storage"
 	"github.com/j0nas500/automuteus/v8/pkg/token"
-	"github.com/automuteus/automuteus/v8/storage"
+	"github.com/j0nas500/automuteus/v8/storage"
 	"github.com/bwmarrin/discordgo"
 	"github.com/top-gg/go-dbl"
 	"log"
