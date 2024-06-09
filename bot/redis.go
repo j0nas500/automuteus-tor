@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"github.com/j0nas500/automuteus-tor/internal/server"
 	"github.com/j0nas500/automuteus-tor/pkg/rediskey"
-	"github.com/j0nas500/automuteus/storage"
+	"github.com/j0nas500/automuteus-tor/storage"
 	"github.com/bsm/redislock"
 	"github.com/bwmarrin/discordgo"
 	"github.com/go-redis/redis/v8"

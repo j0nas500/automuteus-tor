@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/j0nas500/automuteus/v8/pkg/premium"
+	"github.com/j0nas500/automuteus-tor/v8/pkg/premium"
 	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgconn"
 	"github.com/jackc/pgx/v4"

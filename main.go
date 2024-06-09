@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/j0nas500/automuteus-tor/bot/command"
-	"github.com/j0nas500/automuteus-tor/v8/bot/tokenprovider"
+	"github.com/j0nas500/automuteus-tor/bot/tokenprovider"
 	"github.com/j0nas500/automuteus-torinternal/server"
 	"github.com/j0nas500/automuteus-torpkg/capture"
 	"github.com/j0nas500/automuteus-tor/pkg/locale"
@@ -22,9 +22,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/j0nas500/automuteus-tor/v8/storage"
+	"github.com/j0nas500/automuteus-tor/storage"
 
-	"github.com/j0nas500/automuteus-tor/v8/bot"
+	"github.com/j0nas500/automuteus-tor/bot"
 )
 
 var (

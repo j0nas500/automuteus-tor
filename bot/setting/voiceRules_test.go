@@ -1,7 +1,7 @@
 package setting
 
 import (
-	"github.com/j0nas500/automuteus/pkg/game"
+	"github.com/j0nas500/automuteus-tor/pkg/game"
 	"testing"
 )
 

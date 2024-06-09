@@ -2,10 +2,10 @@ package bot
 
 import (
 	_ "embed"
-	"github.com/j0nas500/automuteus/bot/command"
-	"github.com/j0nas500/automuteus/docs"
-	"github.com/j0nas500/automuteus/pkg/discord"
-	"github.com/j0nas500/automuteus/pkg/premium"
+	"github.com/j0nas500/automuteus-tor/bot/command"
+	"github.com/j0nas500/automuteus-tor/docs"
+	"github.com/j0nas500/automuteus-tor/pkg/discord"
+	"github.com/j0nas500/automuteus-tor/pkg/premium"
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"

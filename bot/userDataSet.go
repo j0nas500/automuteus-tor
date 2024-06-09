@@ -2,7 +2,7 @@ package bot
 
 import (
 	"fmt"
-	"github.com/j0nas500/automuteus/pkg/amongus"
+	"github.com/j0nas500/automuteus-tor/pkg/amongus"
 	"strings"
 )
 
