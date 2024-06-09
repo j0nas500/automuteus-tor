@@ -4,7 +4,7 @@ import "fmt"
 
 type PlayMap int
 
-const DefaultMapsUrl = "https://github.com/automuteus/automuteus/blob/master/assets/maps/"
+const DefaultMapsUrl = "https://github.com/j0nas500/automuteus-tor/blob/master/assets/maps/"
 
 const (
 	SKELD PlayMap = iota
