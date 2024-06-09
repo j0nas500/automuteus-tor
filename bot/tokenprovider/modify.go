@@ -3,9 +3,9 @@ package tokenprovider
 import (
 	"context"
 	"encoding/json"
-	"github.com/automuteus/automuteus/internal/server"
-	"github.com/automuteus/automuteus/pkg/rediskey"
-	"github.com/automuteus/automuteus/pkg/task"
+	"github.com/j0nas500/automuteus-tor/internal/server"
+	"github.com/j0nas500/automuteus-tor/pkg/rediskey"
+	"github.com/j0nas500/automuteus-tor/pkg/task"
 	"github.com/go-redis/redis/v8"
 	"log"
 )

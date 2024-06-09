@@ -37,7 +37,7 @@
 "commands.new.success.code" = "Код"
 "commands.new.success.url" = "URL"
 "commands.no_permissions" = "К сожалению, вы не имеете необходимых прав для выполнения этой команды."
-"commands.privacy.info" = "Конфиденциальность и подробности сбора данных AutoMuteU.\\nПодробнее [here](https://github.com/automuteus/automuteus/blob/master/PRIVACY.md)"
+"commands.privacy.info" = "Конфиденциальность и подробности сбора данных AutoMuteU.\\nПодробнее [here](https://github.com/j0nas500/automuteus-tor/blob/master/PRIVACY.md)"
 "commands.privacy.opt.error" = "❌ Я столкнулся с ошибкой при изменении вашего статуса участника:\\n`{{.Error}}`"
 "commands.privacy.opt.success" = "✅ я успешно изменил ваш статус"
 "commands.privacy.showme.cache" = "❗ Вот ваши кэшированные внутриигровые имена:"

@@ -37,7 +37,7 @@
 "commands.new.success.code" = "代码"
 "commands.new.success.url" = "网址"
 "commands.no_permissions" = "抱歉，您没有发布此命令所需的权限。"
-"commands.privacy.info" = "AutoMuteus 隐私和数据收集详细信息。\\n更多详细信息 [here](https://github.com/automuteus/automuteus/blob/master/PRIVACY.md)"
+"commands.privacy.info" = "AutoMuteus 隐私和数据收集详细信息。\\n更多详细信息 [here](https://github.com/j0nas500/automuteus-tor/blob/master/PRIVACY.md)"
 "commands.privacy.opt.error" = "❌ I encountered an error changing your opt in/out status:\\n`{{.Error}}`"
 "commands.privacy.opt.success" = "✅ I successfully changed your opt in/out status"
 "commands.privacy.showme.cache" = "❗ Here's your cached in-game names:"
