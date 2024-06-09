@@ -2,7 +2,6 @@ package command
 
 import (
 	"strings"
-
 	"github.com/bwmarrin/discordgo"
 	"github.com/j0nas500/automuteus-tor/pkg/discord"
 	"github.com/j0nas500/automuteus-tor/pkg/settings"

@@ -24,7 +24,7 @@ import (
 
 	"github.com/j0nas500/automuteus/storage"
 
-	"github.com/j0nas500/automuteus/discord"
+	"github.com/j0nas500/automuteus-tor/bot"
 )
 
 var (
