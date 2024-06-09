@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"github.com/j0nas500/automuteus-tor/v8/pkg/premium"
+	"github.com/j0nas500/automuteus-tor/pkg/premium"
 	"github.com/jackc/pgconn"
 	"github.com/pashagolub/pgxmock"
 	"testing"

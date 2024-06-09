@@ -1,7 +1,7 @@
 package amongus
 
 import (
-	"github.com/j0nas500/automuteus-tor/v8/pkg/game"
+	"github.com/j0nas500/automuteus-tor/pkg/game"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
 
