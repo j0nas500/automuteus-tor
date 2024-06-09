@@ -1,4 +1,4 @@
-FROM --platform=${BUILDPLATFORM} golang:1.18-alpine AS builder
+FROM --platform=${BUILDPLATFORM} golang:1.19-alpine AS builder
 ARG TARGETOS
 ARG TARGETARCH
 # Git is required for getting the dependencies.
@@ -11,9 +11,13 @@ WORKDIR /src
 # and will therefore be cached for speeding up the next build
 COPY ./go.mod ./go.sum ./
 RUN go mod download
+# Install the swag tool that generates swagger docs from the source code
+RUN go install github.com/swaggo/swag/cmd/swag@v1.8.12
 
 # Import the code from the context.
 COPY ./ ./
+# Generate API documentation
+RUN CGO_ENABLED=0 swag init --parseDependency true
 
 # Build the executable to `/app`. Mark the build as statically linked.
 # hadolint ignore=SC2155
@@ -34,7 +38,7 @@ FROM alpine:3.13.0 AS final
 # * App directory to allow mounting volumes
 RUN addgroup -g 1000 bot && \
     adduser -HD -u 1000 -G bot bot && \
-    mkdir -p /app/logs /app/locales /app/storage && \
+    mkdir -p /app/logs /app/locales && \
     chown -R bot:bot /app
 USER bot
 WORKDIR /app
@@ -42,8 +46,9 @@ WORKDIR /app
 # Import the compiled executable and locales.
 COPY --from=builder /app /app
 COPY ./locales/ /app/locales
-COPY ./storage/postgres.sql /app/storage/postgres.sql
 
+# Port used for AMU API
+EXPOSE 5000
 # Port used for health/liveliness checks
 EXPOSE 8080
 # Port used for prometheus metrics
