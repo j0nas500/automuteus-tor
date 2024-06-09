@@ -1,4 +1,4 @@
-package bot
+package discord
 
 import (
 	"github.com/j0nas500/automuteus-tor/internal/server"
@@ -34,20 +34,17 @@ func (gsm *GameStateMessage) Exists() bool {
 }
 
 func (dgs *GameState) DeleteGameStateMsg(s *discordgo.Session, reset bool) bool {
-	retValue := false
 	if dgs.GameStateMsg.Exists() {
 		err := s.ChannelMessageDelete(dgs.GameStateMsg.MessageChannelID, dgs.GameStateMsg.MessageID)
 		if err != nil {
-			retValue = false
-		} else {
-			retValue = true
+			return false
 		}
+		if reset {
+			dgs.GameStateMsg = MakeGameStateMessage()
+		}
+		return true
 	}
-	// whether or not we were successful in deleting the message, reset the state
-	if reset {
-		dgs.GameStateMsg = MakeGameStateMessage()
-	}
-	return retValue
+	return false
 }
 
 var DeferredEdits = make(map[string]*discordgo.MessageEmbed)
@@ -146,7 +143,7 @@ func (bot *Bot) DispatchRefreshOrEdit(readOnlyDgs *GameState, dgsRequest GameSta
 	} else {
 		edited := readOnlyDgs.dispatchEdit(bot.PrimarySession, bot.gameStateResponse(readOnlyDgs, sett))
 		if edited {
-			server.RecordDiscordRequests(bot.RedisInterface.client, server.MessageEdit, 1)
+			metrics.RecordDiscordRequests(bot.RedisInterface.client, metrics.MessageEdit, 1)
 		}
 	}
 }

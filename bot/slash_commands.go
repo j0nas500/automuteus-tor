@@ -1,8 +1,7 @@
-package bot
+package discord
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/j0nas500/automuteus-tor/internal/server"
 	"github.com/j0nas500/automuteus-tor/pkg/storage"
@@ -76,7 +75,7 @@ func (bot *Bot) handleInteractionCreate(s *discordgo.Session, i *discordgo.Inter
 				if err != nil {
 					log.Println("err issuing wait response ", err)
 				}
-				followUpMsg, err = s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
+				followUpMsg, err = s.FollowupMessageCreate(s.State.User.ID, i.Interaction, true, &discordgo.WebhookParams{
 					Content: Hourglass,
 				})
 				if err != nil {
@@ -92,10 +91,10 @@ func (bot *Bot) handleInteractionCreate(s *discordgo.Session, i *discordgo.Inter
 					if content == "" {
 						content = "\u200b"
 					}
-					followUpMsg, err = s.FollowupMessageEdit(i.Interaction, followUpMsg.ID, &discordgo.WebhookEdit{
-						Content:    &content,
-						Components: &resp.Data.Components,
-						Embeds:     &resp.Data.Embeds,
+					followUpMsg, err = s.FollowupMessageEdit(s.State.User.ID, i.Interaction, followUpMsg.ID, &discordgo.WebhookEdit{
+						Content:    content,
+						Components: resp.Data.Components,
+						Embeds:     resp.Data.Embeds,
 					})
 				} else {
 					//TODO if this shows up in logs regularly, print more context
@@ -133,7 +132,7 @@ func (bot *Bot) slashCommandHandler(s *discordgo.Session, i *discordgo.Interacti
 	if interactionLock == nil {
 		return nil
 	}
-	defer server.RecordDiscordRequests(bot.RedisInterface.client, server.MessageCreateDelete, 1)
+	defer metrics.RecordDiscordRequests(bot.RedisInterface.client, metrics.MessageCreateDelete, 1)
 	defer interactionLock.Release(ctx)
 
 	sett := bot.StorageInterface.GetGuildSettings(i.GuildID)
@@ -298,16 +297,15 @@ func (bot *Bot) slashCommandHandler(s *discordgo.Session, i *discordgo.Interacti
 				bot.EndGameChannels[dgs.ConnectCode] = killChan
 				bot.ChannelsMapLock.Unlock()
 
-				hyperlink, apiHyperlink, minimalURL := formCaptureURL(bot.url, dgs.ConnectCode)
+				hyperlink, minimalURL := formCaptureURL(bot.url, dgs.ConnectCode)
 
 				bot.handleGameStartMessage(i.GuildID, i.ChannelID, voiceChannelID, i.Member.User.ID, sett, g, dgs.ConnectCode)
 
 				return command.NewResponse(status, command.NewInfo{
-					Hyperlink:    hyperlink,
-					ApiHyperlink: apiHyperlink,
-					MinimalURL:   minimalURL,
-					ConnectCode:  dgs.ConnectCode,
-					ActiveGames:  activeGames, // not actually needed for Success messages
+					Hyperlink:   hyperlink,
+					MinimalURL:  minimalURL,
+					ConnectCode: dgs.ConnectCode,
+					ActiveGames: activeGames, // not actually needed for Success messages
 				}, sett)
 			} else {
 				// release the lock
@@ -509,52 +507,13 @@ func (bot *Bot) slashCommandHandler(s *discordgo.Session, i *discordgo.Interacti
 					err := bot.RedisInterface.DeleteLinksByUserID(i.GuildID, id)
 					return command.DebugResponse(setting.Clear, nil, nil, id, err, sett)
 				}
-			} else if action == command.Unmute {
-				// prob shouldn't be constructing the GameState explicitly like this... okay so long as we don't reuse it
-				dgs := GameState{
-					GuildID:     i.GuildID,
-					ConnectCode: i.GuildID + "-unmute",
-				}
-				// admins can always unmute no matter what
-				if isAdmin {
-					err = bot.applyToSingle(&dgs, id, false, false)
-					if err != nil {
-						return command.PrivateErrorResponse(command.Unmute, err, sett)
-					}
-					return command.PrivateResponse(ThumbsUp)
-				}
-
-				for _, v := range g.VoiceStates {
-					if v.UserID == id {
-						// fetch the game state purely by the voice channel ID
-						gsr.TextChannel = ""
-						gsr.VoiceChannel = v.ChannelID
-						log.Println("fetching game by id ", v.ChannelID)
-
-						// no game is happening in this voice channel, so we're safe to unmute
-						if bot.RedisInterface.getDiscordGameStateKey(gsr) == "" {
-							err = bot.applyToSingle(&dgs, id, false, false)
-							if err != nil {
-								return command.PrivateErrorResponse(command.Unmute, err, sett)
-							}
-							return command.PrivateResponse(ThumbsUp)
-						} else {
-							// there's a game happening, so we can't unmute
-							return command.DebugResponse(command.Unmute, nil, nil, id, errors.New(""), sett)
-						}
-					}
-				}
-				return command.PrivateErrorResponse(command.Unmute, errors.New("user is not in a voice channel"), sett)
 			} else if action == command.UnmuteAll {
 				dgs := bot.RedisInterface.GetReadOnlyDiscordGameState(gsr)
-				if dgs != nil {
-					err = bot.applyToAll(dgs, false, false)
-					if err != nil {
-						return command.PrivateErrorResponse(command.UnmuteAll, err, sett)
-					}
-					return command.PrivateResponse(ThumbsUp)
+				err = bot.applyToAll(dgs, false, false)
+				if err != nil {
+					return command.PrivateErrorResponse(command.UnmuteAll, err, sett)
 				}
-				return command.DeadlockGameStateResponse(command.UnmuteAll, sett)
+				return command.PrivateResponse(ThumbsUp)
 			}
 		case command.Download.Name:
 			if !isAdmin {
@@ -949,7 +908,6 @@ func confirmationComponents(confirmedID string, canceledID string, sett *setting
 						ID:    "commands.stats.reset.button.proceed",
 						Other: "Confirm",
 					}),
-					Emoji: discordgo.ComponentEmoji{Name: ThumbsUp},
 				},
 				discordgo.Button{
 					CustomID: canceledID,
@@ -958,7 +916,6 @@ func confirmationComponents(confirmedID string, canceledID string, sett *setting
 						ID:    "commands.stats.reset.button.cancel",
 						Other: "Cancel",
 					}),
-					Emoji: discordgo.ComponentEmoji{Name: X},
 				},
 			},
 		},

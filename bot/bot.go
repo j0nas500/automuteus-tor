@@ -1,4 +1,4 @@
-package bot
+package discord
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/j0nas500/automuteus-tor/bot/command"
 	"github.com/j0nas500/automuteus-tor/bot/tokenprovider"
-	"github.com/j0nas500/automuteus-torv8/internal/server"
+	"github.com/j0nas500/automuteus-tor/internal/server"
 	"github.com/j0nas500/automuteus-tor/v8/pkg/amongus"
 	"github.com/j0nas500/automuteus-tor/pkg/discord"
 	"github.com/j0nas500/automuteus-tor/pkg/game"
@@ -26,8 +26,6 @@ import (
 )
 
 type Bot struct {
-	version  string
-	commit   string
 	official bool
 	url      string
 
@@ -42,7 +40,7 @@ type Bot struct {
 
 	PrimarySession *discordgo.Session
 
-	TokenProvider *tokenprovider.TokenProvider
+	GalactusClient *GalactusClient
 
 	TopGGClient *dbl.Client
 
@@ -59,7 +57,7 @@ type Bot struct {
 
 // MakeAndStartBot does what it sounds like
 // TODO collapse these fields into proper structs?
-func MakeAndStartBot(version, commit, botToken, topGGToken, url, emojiGuildID string, numShards, shardID int, redisInterface *RedisInterface, storageInterface *storage.StorageInterface, psql *storageutils.PsqlInterface, logPath string) *Bot {
+func MakeAndStartBot(version, commit, botToken, topGGToken, url, emojiGuildID string, numShards, shardID int, redisInterface *RedisInterface, storageInterface *storage.StorageInterface, psql *storageutils.PsqlInterface, gc *GalactusClient, logPath string) *Bot {
 	dg, err := discordgo.New("Bot " + botToken)
 	if err != nil {
 		log.Println("error creating Discord session,", err)
@@ -73,8 +71,6 @@ func MakeAndStartBot(version, commit, botToken, topGGToken, url, emojiGuildID st
 	}
 
 	bot := Bot{
-		version:      version,
-		commit:       commit,
 		official:     os.Getenv("AUTOMUTEUS_OFFICIAL") != "",
 		url:          url,
 		ConnsToGames: make(map[string]string),
@@ -83,6 +79,7 @@ func MakeAndStartBot(version, commit, botToken, topGGToken, url, emojiGuildID st
 		EndGameChannels:   make(map[string]chan EndGameMessage),
 		ChannelsMapLock:   sync.RWMutex{},
 		PrimarySession:    dg,
+		GalactusClient:    gc,
 		RedisInterface:    redisInterface,
 		StorageInterface:  storageInterface,
 		PostgresInterface: psql,
@@ -102,7 +99,7 @@ func MakeAndStartBot(version, commit, botToken, topGGToken, url, emojiGuildID st
 		log.Println("Bot is now online according to discord Ready handler")
 	})
 
-	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildVoiceStates | discordgo.IntentsGuilds)
+	dg.Identify.Intents = discordgo.MakeIntent(discordgo.IntentsGuildVoiceStates | discordgo.IntentsGuilds | discordgo.IntentsGuildMessages)
 
 	token.WaitForToken(bot.RedisInterface.client, botToken)
 	token.LockForToken(bot.RedisInterface.client, botToken)
@@ -113,6 +110,13 @@ func MakeAndStartBot(version, commit, botToken, topGGToken, url, emojiGuildID st
 		return nil
 	}
 
+	rediskey.SetVersionAndCommit(context.Background(), bot.RedisInterface.client, version, commit)
+
+	nodeID := os.Getenv("SCW_NODE_ID")
+	go metrics.PrometheusMetricsServer(bot.RedisInterface.client, nodeID, "2112")
+
+	go metrics.StartHealthCheckServer("8080")
+
 	log.Println("Finished identifying to the Discord API. Now ready for incoming events")
 
 	listeningTo := os.Getenv("AUTOMUTEUS_LISTENING")
@@ -120,7 +124,6 @@ func MakeAndStartBot(version, commit, botToken, topGGToken, url, emojiGuildID st
 		listeningTo = "/help"
 	}
 
-	// pretty sure this needs to happen per-shard
 	status := &discordgo.UpdateStatusData{
 		IdleSince: nil,
 		Activities: []*discordgo.Activity{&discordgo.Activity{
@@ -135,6 +138,9 @@ func MakeAndStartBot(version, commit, botToken, topGGToken, url, emojiGuildID st
 		log.Println(err)
 	}
 
+	// indicate to Kubernetes that we're ready to start receiving traffic
+	metrics.GlobalReady = true
+
 	if topGGToken != "" {
 		dblClient, err := dbl.NewClient(topGGToken)
 		if err != nil {
@@ -145,15 +151,28 @@ func MakeAndStartBot(version, commit, botToken, topGGToken, url, emojiGuildID st
 		log.Println("No TOP_GG_TOKEN provided")
 	}
 
+	// TODO this is ugly. Should make a proper cronjob to refresh the stats regularly
+	go bot.statsRefreshWorker(rediskey.TotalUsersExpiration)
+
 	return &bot
 }
 
-func (bot *Bot) InitTokenProvider(tp *tokenprovider.TokenProvider) {
-	tp.Init(bot.RedisInterface.client, bot.PrimarySession)
-}
+func (bot *Bot) statsRefreshWorker(dur time.Duration) {
+	for {
+		users := rediskey.GetTotalUsers(context.Background(), bot.RedisInterface.client)
+		if users == rediskey.NotFound {
+			log.Println("Refreshing user stats with worker")
+			rediskey.RefreshTotalUsers(context.Background(), bot.RedisInterface.client, bot.PostgresInterface.Pool)
+		}
 
-func (bot *Bot) StartMetricsServer(nodeID string) error {
-	return server.PrometheusMetricsServer(bot.RedisInterface.client, nodeID, "2112")
+		games := rediskey.GetTotalGames(context.Background(), bot.RedisInterface.client)
+		if games == rediskey.NotFound {
+			log.Println("Refreshing game stats with worker")
+			rediskey.RefreshTotalGames(context.Background(), bot.RedisInterface.client, bot.PostgresInterface.Pool)
+		}
+
+		time.Sleep(dur)
+	}
 }
 
 func (bot *Bot) Close() {
@@ -163,6 +182,7 @@ func (bot *Bot) Close() {
 }
 
 var EmojiLock = sync.Mutex{}
+var AllEmojisStartup []*discordgo.Emoji = nil
 
 func (bot *Bot) newGuild(emojiGuildID string) func(s *discordgo.Session, m *discordgo.GuildCreate) {
 	return func(s *discordgo.Session, m *discordgo.GuildCreate) {
@@ -172,9 +192,14 @@ func (bot *Bot) newGuild(emojiGuildID string) func(s *discordgo.Session, m *disc
 		}
 
 		go func() {
-			_, err = bot.PostgresInterface.EnsureGuildExists(gid, m.Guild.Name)
+			guild, err := bot.PostgresInterface.EnsureGuildExists(gid, m.Guild.Name)
 			if err != nil {
 				log.Println(err)
+			} else if guild != nil {
+				err = bot.GalactusClient.VerifyPremiumMembership(guild.GuildID, premium.Tier(guild.Premium))
+				if err != nil {
+					log.Println(err)
+				}
 			}
 		}()
 
@@ -185,19 +210,27 @@ func (bot *Bot) newGuild(emojiGuildID string) func(s *discordgo.Session, m *disc
 			log.Println("[This is not an error] No explicit guildID provided for emojis; using the current guild default")
 			emojiGuildID = m.Guild.ID
 		}
-		// only check/add emojis to the server denoted for emojis, OR, this server that we picked as a fallback above ^
-		uploadMissingEmojis := emojiGuildID == m.Guild.ID
 
+		// TODO make the emoji guild ID mandatory
 		EmojiLock.Lock()
-		// only add the emojis if they haven't been added already. Saves api calls for bots in guilds
-		if bot.StatusEmojis.isEmpty() {
+		if AllEmojisStartup == nil {
 			allEmojis, err := s.GuildEmojis(emojiGuildID)
 			if err != nil {
 				log.Println(err)
 			} else {
-				bot.verifyEmojis(s, emojiGuildID, true, allEmojis, uploadMissingEmojis)
-				bot.verifyEmojis(s, emojiGuildID, false, allEmojis, uploadMissingEmojis)
+				bot.addAllMissingEmojis(s, m.Guild.ID, true, allEmojis)
+				//bot.addAllMissingEmojis(s, m.Guild.ID, false, allEmojis)
+
+				// if we specified the guild ID, then any subsequent guilds should just use the existing emojis
+				if os.Getenv("EMOJI_GUILD_ID") != "" {
+					AllEmojisStartup = allEmojis
+					log.Println("Skipping subsequent guilds; emojis added successfully")
+				}
 			}
+		} else {
+			bot.addAllMissingEmojis(s, m.Guild.ID, true, AllEmojisStartup)
+
+			bot.addAllMissingEmojis(s, m.Guild.ID, false, AllEmojisStartup)
 		}
 		EmojiLock.Unlock()
 
@@ -249,7 +282,7 @@ func (bot *Bot) forceEndGame(gsr GameStateRequest) {
 
 	deleted := dgs.DeleteGameStateMsg(bot.PrimarySession, true)
 	if deleted {
-		go server.RecordDiscordRequests(bot.RedisInterface.client, server.MessageCreateDelete, 1)
+		go metrics.RecordDiscordRequests(bot.RedisInterface.client, metrics.MessageCreateDelete, 1)
 	}
 
 	bot.RedisInterface.SetDiscordGameState(dgs, lock)
@@ -288,9 +321,9 @@ func (bot *Bot) RefreshGameStateMessage(gsr GameStateRequest, sett *settings.Gui
 	created := dgs.CreateMessage(bot.PrimarySession, bot.gameStateResponse(dgs, sett), dgs.GameStateMsg.MessageChannelID, dgs.GameStateMsg.LeaderID)
 
 	if deleted && created {
-		go server.RecordDiscordRequests(bot.RedisInterface.client, server.MessageCreateDelete, 2)
+		go metrics.RecordDiscordRequests(bot.RedisInterface.client, metrics.MessageCreateDelete, 2)
 	} else if deleted || created {
-		go server.RecordDiscordRequests(bot.RedisInterface.client, server.MessageCreateDelete, 1)
+		go metrics.RecordDiscordRequests(bot.RedisInterface.client, metrics.MessageCreateDelete, 1)
 	}
 
 	bot.RedisInterface.SetDiscordGameState(dgs, lock)
@@ -299,6 +332,7 @@ func (bot *Bot) RefreshGameStateMessage(gsr GameStateRequest, sett *settings.Gui
 }
 
 func (bot *Bot) getInfo() command.BotInfo {
+	version, commit := rediskey.GetVersionAndCommit(context.Background(), bot.RedisInterface.client)
 	totalGuilds := rediskey.GetGuildCounter(context.Background(), bot.RedisInterface.client)
 	activeGames := rediskey.GetActiveGames(context.Background(), bot.RedisInterface.client, GameTimeoutSeconds)
 
@@ -312,8 +346,8 @@ func (bot *Bot) getInfo() command.BotInfo {
 		totalGames = rediskey.RefreshTotalGames(context.Background(), bot.RedisInterface.client, bot.PostgresInterface.Pool)
 	}
 	return command.BotInfo{
-		Version:     bot.version,
-		Commit:      bot.commit,
+		Version:     version,
+		Commit:      commit,
 		ShardID:     bot.PrimarySession.ShardID,
 		ShardCount:  bot.PrimarySession.ShardCount,
 		TotalGuilds: totalGuilds,
