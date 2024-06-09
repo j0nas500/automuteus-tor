@@ -1,7 +1,6 @@
 package command
 
 import (
-	"bytes"
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
@@ -14,8 +13,6 @@ import (
 const (
 	User      = "user"
 	GameState = "game-state"
-	UnmuteAll = "unmute-all"
-	Unmute    = "unmute"
 )
 
 var Debug = discordgo.ApplicationCommand{
@@ -64,19 +61,7 @@ var Debug = discordgo.ApplicationCommand{
 			Name:        UnmuteAll,
 			Description: "Unmute all players",
 			Type:        discordgo.ApplicationCommandOptionSubCommand,
-		},
-		{
-			Name:        Unmute,
-			Description: "Unmute myself, or a specific user",
-			Type:        discordgo.ApplicationCommandOptionSubCommand,
-			Options: []*discordgo.ApplicationCommandOption{
-				{
-					Name:        User,
-					Description: "User who should be unmuted/undeafened",
-					Type:        discordgo.ApplicationCommandOptionUser,
-					Required:    false,
-				},
-			},
+			// TODO sub-arguments to unmute specific players?
 		},
 	},
 }
@@ -92,8 +77,6 @@ func GetDebugParams(s *discordgo.Session, userID string, options []*discordgo.Ap
 			userID = options[0].Options[0].Options[0].UserValue(s).ID
 		}
 	case setting.Clear:
-		fallthrough
-	case Unmute:
 		if len(options[0].Options) > 0 {
 			userID = options[0].Options[0].UserValue(s).ID
 		}
@@ -103,7 +86,6 @@ func GetDebugParams(s *discordgo.Session, userID string, options []*discordgo.Ap
 
 func DebugResponse(operationType string, cached map[string]interface{}, stateBytes []byte, id string, err error, sett *settings.GuildSettings) *discordgo.InteractionResponse {
 	var content string
-	var files []*discordgo.File
 	switch operationType {
 	case setting.View:
 		if err != nil {
@@ -136,22 +118,8 @@ func DebugResponse(operationType string, cached map[string]interface{}, stateByt
 					})
 				}
 			} else if stateBytes != nil {
-				// if the contents are too long, when including the ```JSON``` formatting characters
-				if len(stateBytes) > 1988 {
-					files = []*discordgo.File{
-						{
-							Name:        "game-state.json",
-							ContentType: "application/json",
-							Reader:      bytes.NewReader(stateBytes),
-						},
-					}
-					content = sett.LocalizeMessage(&i18n.Message{
-						ID:    "commands.download.file.success",
-						Other: "Here's that file for you!",
-					})
-				} else {
-					content = fmt.Sprintf("```JSON\n%s\n```", stateBytes)
-				}
+				// TODO needs to be multiple messages
+				content = fmt.Sprintf("```JSON\n%s\n```", stateBytes)
 			}
 		}
 
@@ -171,22 +139,12 @@ func DebugResponse(operationType string, cached map[string]interface{}, stateByt
 				"User": discord.MentionByUserID(id),
 			})
 		}
-	case Unmute:
-		if err != nil {
-			content = sett.LocalizeMessage(&i18n.Message{
-				ID:    "commands.debug.unmute.error",
-				Other: "A game is active in this channel, so only admins can unmute. Please try in another voice channel",
-			}, map[string]interface{}{
-				"Error": err.Error(),
-			})
-		}
 	}
 	return &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Flags:   1 << 6,
 			Content: content,
-			Files:   files,
 		},
 	}
 }

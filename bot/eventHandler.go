@@ -1,4 +1,4 @@
-package bot
+package discord
 
 import (
 	"bytes"
@@ -127,7 +127,7 @@ func (bot *Bot) SubscribeToGameByConnectCode(guildID, connectCode string, endGam
 								"VoiceChannel": discord.MentionByChannelID(readOnlyDgs.VoiceChannel),
 							},
 						))
-						server.RecordDiscordRequests(bot.RedisInterface.client, server.MessageCreateDelete, 1)
+						metrics.RecordDiscordRequests(bot.RedisInterface.client, metrics.MessageCreateDelete, 1)
 					}
 					correlatedUserID = userID
 				case task.GameOverJob:
@@ -166,10 +166,10 @@ func (bot *Bot) SubscribeToGameByConnectCode(guildID, connectCode string, endGam
 							}
 							msg, err := bot.PrimarySession.ChannelMessageSendEmbed(channelID, embed)
 							if delTime > 0 && err == nil {
-								server.RecordDiscordRequests(bot.RedisInterface.client, server.MessageCreateDelete, 2)
+								metrics.RecordDiscordRequests(bot.RedisInterface.client, metrics.MessageCreateDelete, 2)
 								go MessageDeleteWorker(bot.PrimarySession, msg.ChannelID, msg.ID, time.Minute*time.Duration(delTime))
 							} else if err == nil {
-								server.RecordDiscordRequests(bot.RedisInterface.client, server.MessageCreateDelete, 1)
+								metrics.RecordDiscordRequests(bot.RedisInterface.client, metrics.MessageCreateDelete, 1)
 							}
 						}
 						go dumpGameToPostgres(*dgs, bot.PostgresInterface, gameOverResult)
@@ -193,7 +193,7 @@ func (bot *Bot) SubscribeToGameByConnectCode(guildID, connectCode string, endGam
 				if job.JobType != task.ConnectionJob {
 					go func(userID string, ge storage.PostgresGameEvent) {
 						dgs := bot.RedisInterface.GetReadOnlyDiscordGameState(dgsRequest)
-						if dgs != nil && dgs.MatchID > 0 && dgs.MatchStartUnix > 0 {
+						if dgs.MatchID > 0 && dgs.MatchStartUnix > 0 {
 							ge.GameID = dgs.MatchID
 							if userID != "" {
 								num, err := strconv.ParseUint(userID, 10, 64)

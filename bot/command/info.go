@@ -5,6 +5,7 @@ import (
 	"github.com/j0nas500/automuteus-tor/pkg/settings"
 	"github.com/bwmarrin/discordgo"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
+	"strings"
 	"time"
 )
 
@@ -14,17 +15,20 @@ var Info = discordgo.ApplicationCommand{
 }
 
 type BotInfo struct {
-	Version     string `json:"version"`
-	Commit      string `json:"commit"`
-	ShardID     int    `json:"shardID"`
-	ShardCount  int    `json:"shardCount"`
-	TotalGuilds int64  `json:"totalGuilds"`
-	ActiveGames int64  `json:"activeGames"`
-	TotalUsers  int64  `json:"totalUsers"`
-	TotalGames  int64  `json:"totalGames"`
+	Version     string
+	Commit      string
+	ShardID     int
+	ShardCount  int
+	TotalGuilds int64
+	ActiveGames int64
+	TotalUsers  int64
+	TotalGames  int64
 }
 
 func InfoResponse(info BotInfo, guildID string, sett *settings.GuildSettings) *discordgo.InteractionResponse {
+	if strings.HasPrefix(info.Version, "6.9") {
+		info.Version = "😎 " + info.Version + " 😎"
+	}
 	embed := discordgo.MessageEmbed{
 		URL:  "",
 		Type: "",
@@ -43,7 +47,7 @@ func InfoResponse(info BotInfo, guildID string, sett *settings.GuildSettings) *d
 		Footer: &discordgo.MessageEmbedFooter{
 			Text: sett.LocalizeMessage(&i18n.Message{
 				ID:    "commands.info.footer",
-				Other: "{{.Version}}-{{.Commit}} | Shard {{.ID}}/{{.Num}}",
+				Other: "v{{.Version}}-{{.Commit}} | Shard {{.ID}}/{{.Num}}",
 			},
 				map[string]interface{}{
 					"Version": info.Version,

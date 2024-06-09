@@ -1,15 +1,16 @@
-package bot
+package discord
 
 import (
-	"github.com/j0nas500/automuteus-tor/amongus"
+	"github.com/j0nas500/automuteus-tor/pkg/amongus"
 	"github.com/bwmarrin/discordgo"
 )
 
 // User struct
 type User struct {
-	Nick     string `json:"Nick"`
-	UserID   string `json:"UserID"`
-	UserName string `json:"UserName"`
+	Nick          string `json:"Nick"`
+	UserID        string `json:"UserID"`
+	UserName      string `json:"UserName"`
+	Discriminator string `json:"Discriminator"`
 }
 
 // UserData struct
@@ -23,9 +24,10 @@ type UserData struct {
 func MakeUserDataFromDiscordUser(dUser *discordgo.User, nick string) UserData {
 	return UserData{
 		User: User{
-			Nick:     nick,
-			UserID:   dUser.ID,
-			UserName: dUser.Username,
+			Nick:          nick,
+			UserID:        dUser.ID,
+			UserName:      dUser.Username,
+			Discriminator: dUser.Discriminator,
 		},
 		ShouldBeDeaf: false,
 		ShouldBeMute: false,

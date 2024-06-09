@@ -16,11 +16,10 @@ const (
 )
 
 type NewInfo struct {
-	Hyperlink    string
-	MinimalURL   string
-	ApiHyperlink string
-	ConnectCode  string
-	ActiveGames  int64
+	Hyperlink   string
+	MinimalURL  string
+	ConnectCode string
+	ActiveGames int64
 }
 
 var New = discordgo.ApplicationCommand{
@@ -31,21 +30,18 @@ var New = discordgo.ApplicationCommand{
 func NewResponse(status NewStatus, info NewInfo, sett *settings.GuildSettings) *discordgo.InteractionResponse {
 	var content string
 	var embeds []*discordgo.MessageEmbed
-	flags := discordgo.MessageFlagsEphemeral // private message by default
+	var flags uint64 = 1 << 6 // private message by default
 
 	switch status {
 	case NewSuccess:
 		content = sett.LocalizeMessage(&i18n.Message{
 			ID: "commands.new.success",
-			Other: "Paste this link into your web browser:\n <{{.hyperlink}}>\n" +
-				"or click [here]({{.apiHyperlink}})\n\n" +
-				"If the URL doesn't work, you may need to run the capture program first, and then try again.\n\n" +
+			Other: "Click the following link to link your capture: \n <{{.hyperlink}}>\n\n" +
 				"Don't have the capture installed? Latest version [here]({{.downloadURL}})\n\nTo link your capture manually:",
 		},
 			map[string]interface{}{
-				"hyperlink":    info.Hyperlink,
-				"apiHyperlink": info.ApiHyperlink,
-				"downloadURL":  CaptureDownloadURL,
+				"hyperlink":   info.Hyperlink,
+				"downloadURL": CaptureDownloadURL,
 			})
 		embeds = []*discordgo.MessageEmbed{
 			{
@@ -78,12 +74,12 @@ func NewResponse(status NewStatus, info NewInfo, sett *settings.GuildSettings) *
 		content = sett.LocalizeMessage(&i18n.Message{
 			ID: "commands.new.lockout",
 			Other: "If I start any more games, Discord will lock me out, or throttle the games I'm running! 😦\n" +
-				"Please try again in a few minutes, or consider AutoMuteUs Premium (`/premium`)\n" +
+				"Please try again in a few minutes, or consider AutoMuteUs Premium (`/premium info`)\n" +
 				"Current Games: {{.Games}}",
 		}, map[string]interface{}{
 			"Games": fmt.Sprintf("%d/%d", info.ActiveGames, DefaultMaxActiveGames),
 		})
-		flags = discordgo.MessageFlags(0) // public message
+		flags = 0 // public message
 
 	}
 	return &discordgo.InteractionResponse{

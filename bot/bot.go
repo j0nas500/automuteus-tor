@@ -7,7 +7,7 @@ import (
 	"github.com/j0nas500/automuteus-tor/bot/command"
 	"github.com/j0nas500/automuteus-tor/bot/tokenprovider"
 	"github.com/j0nas500/automuteus-tor/internal/server"
-	"github.com/j0nas500/automuteus-tor/v8/pkg/amongus"
+	"github.com/j0nas500/automuteus-tor/pkg/amongus"
 	"github.com/j0nas500/automuteus-tor/pkg/discord"
 	"github.com/j0nas500/automuteus-tor/pkg/game"
 	"github.com/j0nas500/automuteus-tor/pkg/premium"

@@ -41,7 +41,24 @@ func MapResponse(mapType game.PlayMap, detailed bool) *discordgo.InteractionResp
 	return &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Content: game.FormMapUrl(os.Getenv("BASE_MAP_URL"), mapType, detailed),
+			Content: FormMapUrl(os.Getenv("BASE_MAP_URL"), mapType, detailed),
 		},
 	}
+}
+
+func FormMapUrl(baseUrl string, mapType game.PlayMap, detailed bool) string {
+	if baseUrl == "" {
+		baseUrl = DefaultBaseUrl
+	}
+	// TODO move to utils
+	mapString := ""
+	for i, v := range game.NameToPlayMap {
+		if v == int32(mapType) {
+			mapString = i
+		}
+	}
+	if detailed {
+		return fmt.Sprintf("%s%s_detailed.png?raw=true", baseUrl, mapString)
+	}
+	return fmt.Sprintf("%s%s.png?raw=true", baseUrl, mapString)
 }

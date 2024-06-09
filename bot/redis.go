@@ -1,4 +1,4 @@
-package bot
+package discord
 
 import (
 	"context"
@@ -53,7 +53,7 @@ func (bot *Bot) refreshGameLiveness(code string) {
 
 func (bot *Bot) rateLimitEventCallback(_ *discordgo.Session, rl *discordgo.RateLimit) {
 	log.Println(rl.Message)
-	server.RecordDiscordRequests(bot.RedisInterface.client, server.InvalidRequest, 1)
+	metrics.RecordDiscordRequests(bot.RedisInterface.client, metrics.InvalidRequest, 1)
 }
 
 func (redisInterface *RedisInterface) AddUniqueGuildCounter(guildID string) {
@@ -107,7 +107,7 @@ func (redisInterface *RedisInterface) LockVoiceChanges(connectCode string, dur t
 
 // need at least one of these fields to fetch
 func (redisInterface *RedisInterface) GetReadOnlyDiscordGameState(gsr GameStateRequest) *GameState {
-	dgs := redisInterface.getDiscordGameState(gsr, false)
+	dgs := redisInterface.getDiscordGameState(gsr)
 	i := 0
 	for dgs == nil {
 		i++
@@ -115,7 +115,7 @@ func (redisInterface *RedisInterface) GetReadOnlyDiscordGameState(gsr GameStateR
 			log.Println("RETURNING NIL GAMESTATE FOR READONLY FETCH")
 			return nil
 		}
-		dgs = redisInterface.getDiscordGameState(gsr, false)
+		dgs = redisInterface.getDiscordGameState(gsr)
 	}
 	return dgs
 }
@@ -144,25 +144,21 @@ func (redisInterface *RedisInterface) GetDiscordGameStateAndLock(gsr GameStateRe
 		return nil, nil
 	}
 
-	return lock, redisInterface.getDiscordGameState(gsr, true)
+	return lock, redisInterface.getDiscordGameState(gsr)
 }
 
-func (redisInterface *RedisInterface) getDiscordGameState(gsr GameStateRequest, createOnNil bool) *GameState {
+func (redisInterface *RedisInterface) getDiscordGameState(gsr GameStateRequest) *GameState {
 	key := redisInterface.getDiscordGameStateKey(gsr)
 
 	jsonStr, err := redisInterface.client.Get(ctx, key).Result()
 	switch {
 	case errors.Is(err, redis.Nil):
-		if createOnNil {
-			dgs := NewDiscordGameState(gsr.GuildID)
-			dgs.ConnectCode = gsr.ConnectCode
-			dgs.GameStateMsg.MessageChannelID = gsr.TextChannel
-			dgs.VoiceChannel = gsr.VoiceChannel
-			redisInterface.SetDiscordGameState(dgs, nil)
-			return dgs
-		} else {
-			return nil
-		}
+		dgs := NewDiscordGameState(gsr.GuildID)
+		dgs.ConnectCode = gsr.ConnectCode
+		dgs.GameStateMsg.MessageChannelID = gsr.TextChannel
+		dgs.VoiceChannel = gsr.VoiceChannel
+		redisInterface.SetDiscordGameState(dgs, nil)
+		return dgs
 	case err != nil:
 		log.Println(err)
 		return nil
@@ -201,7 +197,7 @@ func (redisInterface *RedisInterface) SetDiscordGameState(data *GameState, lock 
 	})
 
 	// connectCode is the 1 sole key we should ever rely on for tracking games. Because we generate it ourselves
-	// randomly, it's unique to every single game, and the capture and bot BOTH agree on the linkage
+	// randomly, it's unique to every single amongus, and the capture and bot BOTH agree on the linkage
 	if key == "" && data.ConnectCode == "" {
 		if lock != nil {
 			lock.Release(ctx)
@@ -305,12 +301,7 @@ func (redisInterface *RedisInterface) DeleteDiscordGameState(dgs *GameState) {
 	data := redisInterface.getDiscordGameState(GameStateRequest{
 		GuildID:     guildID,
 		ConnectCode: connCode,
-	}, false)
-
-	// couldn't find the game state; exit
-	if data == nil {
-		return
-	}
+	})
 	key := rediskey.ConnectCodeData(guildID, connCode)
 
 	locker := redislock.New(redisInterface.client)

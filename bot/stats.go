@@ -1,4 +1,4 @@
-package bot
+package discord
 
 import (
 	"bytes"
@@ -545,7 +545,7 @@ func (bot *Bot) GuildStatsEmbed(guildID string, sett *settings.GuildSettings, is
 		gname = guildID
 	} else {
 		gname = g.Name
-		avatarURL = g.IconURL("256")
+		avatarURL = g.IconURL()
 	}
 
 	gamesPlayed := bot.PostgresInterface.NumGamesPlayedOnGuild(guildID)

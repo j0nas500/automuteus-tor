@@ -1,4 +1,4 @@
-package bot
+package discord
 
 import (
 	"context"
@@ -38,7 +38,13 @@ func (bot *Bot) applyToSingle(dgs *GameState, userID string, mute, deaf bool) er
 		},
 	}
 	// nil lock because this is an override; we don't care about legitimately obtaining the lock
-	return bot.TokenProvider.ModifyUsers(dgs.GuildID, dgs.ConnectCode, req, nil)
+	mdsc, err := bot.GalactusClient.ModifyUsers(dgs.GuildID, dgs.ConnectCode, req, nil)
+	if err != nil {
+		return err
+	} else if mdsc != nil {
+		go RecordDiscordRequestsByCounts(bot.RedisInterface.client, mdsc)
+	}
+	return nil
 }
 
 func (bot *Bot) applyToAll(dgs *GameState, mute, deaf bool) error {
@@ -87,7 +93,12 @@ func (bot *Bot) applyToAll(dgs *GameState, mute, deaf bool) error {
 			Users:   users,
 		}
 		// nil lock because this is an override; we don't care about legitimately obtaining the lock
-		return bot.TokenProvider.ModifyUsers(dgs.GuildID, dgs.ConnectCode, req, nil)
+		mdsc, err := bot.GalactusClient.ModifyUsers(dgs.GuildID, dgs.ConnectCode, req, nil)
+		if err != nil {
+			return err
+		} else if mdsc != nil {
+			go RecordDiscordRequestsByCounts(bot.RedisInterface.client, mdsc)
+		}
 	}
 	return nil
 }
@@ -223,5 +234,11 @@ func (bot *Bot) handleTrackedMembers(sess *discordgo.Session, sett *settings.Gui
 }
 
 func (bot *Bot) issueMutesAndRecord(guildID, connectCode string, req task.UserModifyRequest, lock *redislock.Lock) error {
-	return bot.TokenProvider.ModifyUsers(guildID, connectCode, req, lock)
+	mdsc, err := bot.GalactusClient.ModifyUsers(guildID, connectCode, req, lock)
+	if err != nil {
+		return err
+	} else if mdsc != nil {
+		go RecordDiscordRequestsByCounts(bot.RedisInterface.client, mdsc)
+	}
+	return nil
 }

@@ -3,8 +3,8 @@ package command
 import (
 	"fmt"
 	"github.com/j0nas500/automuteus-tor/pkg/discord"
-	"github.com/j0nas500/automuteus-tor/game"
-	"github.com/j0nas500/automuteus-torpkg/settings"
+	"github.com/j0nas500/automuteus-tor/pkg/game"
+	"github.com/j0nas500/automuteus-tor/pkg/settings"
 	"github.com/bwmarrin/discordgo"
 	"github.com/nicksnyder/go-i18n/v2/i18n"
 )
@@ -14,6 +14,7 @@ const (
 	BasePremiumURL        = "https://automute.us/premium?guild="
 	CaptureDownloadURL    = "https://capture.automute.us"
 	DefaultMaxActiveGames = 150
+	UnmuteAll             = "unmute-all"
 )
 
 // All is all slash commands for the bot, ordered to match the README
