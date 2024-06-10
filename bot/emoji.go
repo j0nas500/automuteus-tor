@@ -74,8 +74,8 @@ func (a AlivenessEmojis) isEmpty() bool {
 
 func emptyStatusEmojis() AlivenessEmojis {
 	topMap := make(AlivenessEmojis)
-	topMap[true] = make([]Emoji, 35) // 35 colors for alive/dead
-	topMap[false] = make([]Emoji, 35)
+	topMap[true] = make([]Emoji, 42) // 42 colors for alive/dead
+	topMap[false] = make([]Emoji, 42)
 	return topMap
 }
 
