@@ -220,6 +220,8 @@ Then run the following command anytime new strings or translations are added:
 
 ```
 goi18n extract -outdir locales
+curl -s https://raw.githubusercontent.com/j0nas500/utils/main/locales/active.en.toml >> locales/active.en.toml
+sed -i 's/\\n/\\\\n/g' locales/active.en.toml
 ```
 
 # Self-Hosting
