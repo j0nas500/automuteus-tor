@@ -219,20 +219,20 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 			Name: "aucoral",
 			ID:   "1046352453899137155",
 		},
-		game.Salmon: {
-			Name: "ausalmon",
-			ID:   "1046396936162381885",
+		game.Tamarind: {
+			Name: "autamarind",
+			ID:   "1249750979876884610",
 		},
-		game.Bordeaux: {
-			Name: "aubordeaux",
-			ID:   "1046396801386811392",
+		game.Army: {
+			Name: "auarmy",
+			ID:   "1249750820506042408",
 		},
 		game.Olive: {
 			Name: "auolive",
 			ID:   "1046396896366829658",
 		},
-		game.Turqoise: {
-			Name: "auturqoise",
+		game.Turquoise: {
+			Name: "auturquoise",
 			ID:   "1046396990365372540",
 		},
 		game.Mint: {
@@ -287,6 +287,35 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 			Name: "auice",
 			ID:   "1046396827739635772",
 		},
+		game.Slime: {
+			Name: "auslime",
+			ID:	"1249750941545136161",
+		},
+		game.Sundown: {
+			Name: "ausundown",
+			ID: "1249750961501769771",
+		},
+		game.Fuchsia: {
+			Name: "aufuchsia",
+			ID: "1249750863195537478",
+		},
+		game.Navy: {
+			Name: "aunavy",
+			ID: "1249750883223212232",
+		},
+		game.Ocean: {
+			Name: "auocean",
+			ID: "1249750902533914624",
+		},
+		game.RoyalGreen: {
+			Name: "auroyalgreen",
+			ID: "1249750918908612678",
+		},
+		game.Darkness: {
+			Name: "audarkness",
+			ID: "1249750843960594482",
+		},
+
 	},
 	false: []Emoji{
 		game.Red: {
@@ -361,11 +390,11 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 			Name: "aureddead",
 			ID:   "1046402641435049984",
 		},
-		game.Salmon: {
+		game.Tamarind: {
 			Name: "aureddead",
 			ID:   "1046402641435049984",
 		},
-		game.Bordeaux: {
+		game.Army: {
 			Name: "aureddead",
 			ID:   "1046402641435049984",
 		},
@@ -373,7 +402,7 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 			Name: "aureddead",
 			ID:   "1046402641435049984",
 		},
-		game.Turqoise: {
+		game.Turquoise: {
 			Name: "aureddead",
 			ID:   "1046402641435049984",
 		},
@@ -429,6 +458,34 @@ var GlobalAlivenessEmojis = AlivenessEmojis{
 			Name: "aureddead",
 			ID:   "11046402641435049984",
 		},
+		game.Slime: {
+			Name: "aureddead",
+			ID:   "11046402641435049984",
+		},
+		game.Sundown: {
+			Name: "aureddead",
+			ID:   "11046402641435049984",
+		},
+		game.Fuchsia: {
+			Name: "aureddead",
+			ID:   "11046402641435049984",
+		},
+		game.Navy: {
+			Name: "aureddead",
+			ID:   "11046402641435049984",
+		},
+		game.Ocean: {
+			Name: "aureddead",
+			ID:   "11046402641435049984",
+		},
+		game.RoyalGreen: {
+			Name: "aureddead",
+			ID:   "11046402641435049984",
+		},
+		game.Darkness: {
+			Name: "aureddead",
+			ID:   "11046402641435049984",
+		},
 	},
 }
 
@@ -455,7 +512,7 @@ Helpful for copy/paste into Discord to get new emoji IDs when they are re-upload
 \:ausalmon:
 \:aubordeaux:
 \:auolive:
-\:auturqoise:
+\:auturquoise:
 \:aumint:
 \:aulavender:
 \:aunougat:
@@ -469,6 +526,15 @@ Helpful for copy/paste into Discord to get new emoji IDs when they are re-upload
 \:aublurple:
 \:ausunrise:
 \:auice:
+\:auslime:
+\:ausundown:
+\:aufuchsia:
+\:aunavy:
+\:auocean:
+\:auroyalgreen:
+\:auarmy:
+\:autamarind:
+\:audarkness:
 
 \:aureddead:
 \:aubluedead:

@@ -20,10 +20,10 @@ const (
 	Gray         = 15
 	Tan          = 16
 	Coral        = 17
-	Salmon       = 18
-	Bordeaux     = 19
+	Tamarind	 = 18
+	Army		 = 19
 	Olive        = 20
-	Turqoise     = 21
+	Turquoise    = 21
 	Mint         = 22
 	Lavender     = 23
 	Nougat       = 24
@@ -37,6 +37,13 @@ const (
 	Blurple      = 32
 	Sunrise      = 33
 	Ice          = 34
+	Fuchsia		 = 35
+	RoyalGreen	 = 36
+	Slime		 = 37
+	Navy		 = 38
+	Darkness	 = 39
+	Ocean		 = 40
+	Sundown		 = 41
 )
 
 // ColorStrings for lowercase, possibly for translation if needed
@@ -59,10 +66,10 @@ var ColorStrings = map[string]int{
 	"gray":         Gray,
 	"tan":          Tan,
 	"coral":        Coral,
-	"salmon":       Salmon,
-	"bordeaux":     Bordeaux,
+	"tamarind":     Tamarind,
+	"army":			Army,
 	"olive":        Olive,
-	"turqoise":     Turqoise,
+	"turquoise":    Turquoise,
 	"mint":         Mint,
 	"lavender":     Lavender,
 	"nougat":       Nougat,
@@ -76,6 +83,13 @@ var ColorStrings = map[string]int{
 	"blurple":      Blurple,
 	"sunrise":      Sunrise,
 	"ice":          Ice,
+	"fuchsia":		Fuchsia,
+	"royalgreen":	RoyalGreen,
+	"slime":		Slime,
+	"navy":			Navy,
+	"darkness":		Darkness,
+	"ocean":		Ocean,
+	"sundown": 		Sundown,
 }
 
 var ColorVanillaStrings = map[string]int{
@@ -100,10 +114,10 @@ var ColorVanillaStrings = map[string]int{
 }
 
 var ColorTorStrings = map[string]int{
-	"salmon":       Salmon,
-	"bordeaux":     Bordeaux,
+	"tamarind":     Tamarind,
+	"army":			Army,
 	"olive":        Olive,
-	"turqoise":     Turqoise,
+	"turquoise":    Turquoise,
 	"mint":         Mint,
 	"lavender":     Lavender,
 	"nougat":       Nougat,
@@ -117,6 +131,13 @@ var ColorTorStrings = map[string]int{
 	"blurple":      Blurple,
 	"sunrise":      Sunrise,
 	"ice":          Ice,
+	"fuchsia":		Fuchsia,
+	"royalgreen":	RoyalGreen,
+	"slime":		Slime,
+	"navy":			Navy,
+	"darkness":		Darkness,
+	"ocean":		Ocean,
+	"sundown":		Sundown,
 }
 
 // GetColorStringForInt does what it sounds like
