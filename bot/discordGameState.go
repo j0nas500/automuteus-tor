@@ -109,7 +109,7 @@ func (dgs *GameState) ToEmojiEmbedFields(emojis AlivenessEmojis, sett *settings.
 
 	sorted := make([]*discordgo.MessageEmbedField, num)
 	num = 0
-	for i := 0; i < 42; i++ {
+	for i := 0; i < 41; i++ {
 		if unsorted[i] != nil {
 			sorted[num] = unsorted[i]
 			num++
